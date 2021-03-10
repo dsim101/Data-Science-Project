@@ -4,10 +4,28 @@ author: "Deja Simon"
 date: "3/10/2021"
 output: html_document
 ---
-```{r loading data}
-setwd("~/Downloads")
+```{r packages}
+library(tidyverse)
+library(data.table)
+require(car)
+library(reshape2)
+library(VGAM)
+library(psych)
+library(lsr)
+library(effsize)
+library(fmsb)
+library(sjstats)
+library(frequency)
+library(lm.beta)
+library(afex)
+library(nlme)
+library(Rmisc)
+library(emmeans)
+library(here)
+```
 
-data <- read.csv("GIRA 2_January 29, 2021_13.06.csv")
+```{r loading data}
+data <- read_csv(here("data_raw", "GIRA2_raw.csv"))
 
 # removing headings
 data <- data %>% slice(3:n())
