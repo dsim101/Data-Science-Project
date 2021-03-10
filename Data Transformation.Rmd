@@ -154,6 +154,55 @@ male.cfBasic$Type <- ifelse(grepl("X", male.cfBasic$`Stimuli Race`, ignore.case 
 male.cfBasic <- male.cfBasic %>% select(ResponseId, `Stimuli Race`, Type, Response, Test, res, Correct, Incorrect)
 ```
 
+```{r}
+num_of_hits_white <- fem.cfBasic %>% group_by(ResponseId) %>% mutate(hits_white = case_when(Correct == '1' & Type == "White" ~ 1, TRUE ~ 0)) %>% tally(hits_white)
+
+answer_array <- c("Correct", "Incorrect")
+cor_array <- c("1", "2")
+type_array <- c("White", "Black", "Latinx")
+
+for(k in answer_array){
+for(i in cor_array) {
+  for (j in type_array) {
+    if(k == "Correct" & i == "1") {
+      label <- "hits"
+    } else if(k == "Correct" & i == "2") {
+      label <- "cr"
+    } else if(k == "Incorrect" & i == "1") {
+      label <- "fa"
+    } else if(k == "Incorrect" & i == "2") {
+      label <- "miss"
+    }
+    name <- paste0("num_of_", label, "_",j)
+    if(k == "Correct") {
+    curr_file <- fem.cfBasic %>% group_by(ResponseId) %>%   mutate(hits_white = case_when(Correct == i & Type == j ~ 1, TRUE ~ 0)) %>% tally(hits_white)
+    } else if(k == "Incorrect") {
+    curr_file <- fem.cfBasic %>% group_by(ResponseId) %>%   mutate(hits_white = case_when(Incorrect == i & Type == j ~ 1, TRUE ~ 0)) %>% tally(hits_white)
+    }
+  }
+}
+}
+```
+
+```{r}
+sigDet <- function(data, type) {
+num_of_hits_ <- data %>% group_by(ResponseId) %>% mutate(hits_white = case_when(Correct == '1' & Type == type ~ 1, TRUE ~ 0)) %>% tally(hits_white) 
+
+label <- paste0("num_of_hits_", type)
+file <- assign(label, num_of_hits_)
+
+num_of_cr_ <- data %>% group_by(ResponseId) %>% mutate(cr_white = case_when(Correct == '2' & Type == type ~ 1, TRUE ~ 0)) %>% tally(cr_white) 
+
+num_of_fa_ <- data %>% group_by(ResponseId) %>% mutate(fa_white = case_when(Incorrect == '1' & Type == type ~ 1, TRUE ~ 0)) %>% tally(fa_white) 
+
+num_of_miss_ <- data %>% group_by(ResponseId) %>% mutate(miss_white = case_when(Incorrect == '2' & Type == type ~ 1, TRUE ~ 0)) %>% tally(miss_white) 
+
+cbind(num_of_hits_, num_of_cr_$n, num_of_fa_$n, num_of_miss_$n) %>% set_names("ResponseId", "hits", "crs", "fas", "misses")
+}
+
+sigDet(fem.cfBasic, "White")
+```
+
 ```{r response frequencies - F stim}
 # White stimuli
 num_of_hits_white <- fem.cfBasic %>% group_by(ResponseId) %>% mutate(hits_white = case_when(Correct == '1' & Type == "White" ~ 1, TRUE ~ 0)) %>% tally(hits_white)
