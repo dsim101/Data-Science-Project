@@ -38,6 +38,24 @@ data <- data %>% filter(botcha1 == "The moon is made of green cheese", botcha2 =
 ```
 
 ```{r SDO scale cleaning}
+# minVal <- min(var)
+ #maxVal <- max(var)
+#val_array <- minVal:maxVal
+
+reverseCode <- function(var) {
+  revalue(var, c("7"="1", "6"="2", "5"="3", "4"="4", "3"="5", "2"="6", "1"="7"))
+}
+
+data$SDO2 <- reverseCode(data$SDO2)
+
+revSdoItems <- data %>% select("SDO1":"SDO8")
+test <- as.data.frame(revSdoItems)
+  
+for(x in 1:length(revSdoItems)) {
+  reverseCode(revSdoItems[x]) 
+}
+
+
 # recoding reverse items
 data$SDO1 <- revalue(data$SDO1, c("7"="1", "6"="2", "5"="3", "4"="4", "3"="5", "2"="6", "1"="7"))
 data$SDO2 <- revalue(data$SDO2, c("7"="1", "6"="2", "5"="3", "4"="4", "3"="5", "2"="6", "1"="7"))
@@ -47,6 +65,7 @@ data$SDO5 <- revalue(data$SDO5, c("7"="1", "6"="2", "5"="3", "4"="4", "3"="5", "
 data$SDO6 <- revalue(data$SDO6, c("7"="1", "6"="2", "5"="3", "4"="4", "3"="5", "2"="6", "1"="7"))
 data$SDO7 <- revalue(data$SDO7, c("7"="1", "6"="2", "5"="3", "4"="4", "3"="5", "2"="6", "1"="7"))
 data$SDO8 <- revalue(data$SDO8, c("7"="1", "6"="2", "5"="3", "4"="4", "3"="5", "2"="6", "1"="7"))
+
 
 
 # making all the items numeric
@@ -83,7 +102,6 @@ boxplot(data$SDOtotal)
 
 
 # getting the reliability of the scale
-names(data)
-
-summary(alpha(as.matrix(data[c(605:620)]), check.keys = FALSE))
+SDO <- data %>% select(starts_with("SDO"))
+summary(alpha(SDO, check.keys = FALSE))
 ```
