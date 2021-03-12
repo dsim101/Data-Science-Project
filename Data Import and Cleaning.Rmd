@@ -38,58 +38,24 @@ data <- data %>% filter(botcha1 == "The moon is made of green cheese", botcha2 =
 ```
 
 ```{r SDO scale cleaning}
-# minVal <- min(var)
- #maxVal <- max(var)
-#val_array <- minVal:maxVal
 
 reverseCode <- function(var) {
-  revalue(var, c("7"="1", "6"="2", "5"="3", "4"="4", "3"="5", "2"="6", "1"="7"))
+  var <- recode(var, '7=1 ; 6=2 ; 5=3 ; 4=4 ; 3=5 ; 2=6 ; 1=7')
 }
 
-data$SDO2 <- reverseCode(data$SDO2)
+data[, c("SDO1", "SDO2", "SDO3", "SDO4", "SDO5", "SDO6", "SDO7", "SDO8")] <- apply(data[, c("SDO1", "SDO2", "SDO3", "SDO4", "SDO5", "SDO6", "SDO7", "SDO8")], 2, reverseCode)
 
-revSdoItems <- data %>% select("SDO1":"SDO8")
-test <- as.data.frame(revSdoItems)
-  
-for(x in 1:length(revSdoItems)) {
-  reverseCode(revSdoItems[x]) 
+
+asNumeric <- function(var) {
+ var <- as.numeric(as.character(var))
 }
 
-
-# recoding reverse items
-data$SDO1 <- revalue(data$SDO1, c("7"="1", "6"="2", "5"="3", "4"="4", "3"="5", "2"="6", "1"="7"))
-data$SDO2 <- revalue(data$SDO2, c("7"="1", "6"="2", "5"="3", "4"="4", "3"="5", "2"="6", "1"="7"))
-data$SDO3 <- revalue(data$SDO3, c("7"="1", "6"="2", "5"="3", "4"="4", "3"="5", "2"="6", "1"="7"))
-data$SDO4 <- revalue(data$SDO4, c("7"="1", "6"="2", "5"="3", "4"="4", "3"="5", "2"="6", "1"="7"))
-data$SDO5 <- revalue(data$SDO5, c("7"="1", "6"="2", "5"="3", "4"="4", "3"="5", "2"="6", "1"="7"))
-data$SDO6 <- revalue(data$SDO6, c("7"="1", "6"="2", "5"="3", "4"="4", "3"="5", "2"="6", "1"="7"))
-data$SDO7 <- revalue(data$SDO7, c("7"="1", "6"="2", "5"="3", "4"="4", "3"="5", "2"="6", "1"="7"))
-data$SDO8 <- revalue(data$SDO8, c("7"="1", "6"="2", "5"="3", "4"="4", "3"="5", "2"="6", "1"="7"))
-
-
-
-# making all the items numeric
-data$SDO1 <- as.numeric(as.character(data$SDO1))
-data$SDO2 <- as.numeric(as.character(data$SDO2)) 
-data$SDO3 <- as.numeric(as.character(data$SDO3)) 
-data$SDO4 <- as.numeric(as.character(data$SDO4)) 
-data$SDO5 <- as.numeric(as.character(data$SDO5))
-data$SDO6 <- as.numeric(as.character(data$SDO6))
-data$SDO7 <- as.numeric(as.character(data$SDO7))
-data$SDO8 <- as.numeric(as.character(data$SDO8))
-data$SDO9 <- as.numeric(as.character(data$SDO9))
-data$SDO10 <- as.numeric(as.character(data$SDO10))
-data$SDO11 <- as.numeric(as.character(data$SDO11))
-data$SDO12 <- as.numeric(as.character(data$SDO12))
-data$SDO13 <- as.numeric(as.character(data$SDO13))
-data$SDO14 <- as.numeric(as.character(data$SDO14))
-data$SDO15 <- as.numeric(as.character(data$SDO15))
-data$SDO16 <- as.numeric(as.character(data$SDO16))
+data[, c("SDO1", "SDO2", "SDO3", "SDO4", "SDO5", "SDO6", "SDO7", "SDO8", "SDO9", "SDO10", "SDO11", "SDO12", "SDO13", "SDO14", "SDO15", "SDO16")] <- apply(data[, c("SDO1", "SDO2", "SDO3", "SDO4", "SDO5", "SDO6", "SDO7", "SDO8", "SDO9", "SDO10", "SDO11", "SDO12", "SDO13", "SDO14", "SDO15", "SDO16")], 2, asNumeric)
 
 
 # making a composite variable
 attach(data)
-data$SDOtotal <- (SDO1 + SDO2 + SDO3 + SDO4 + SDO5 + SDO6 + SDO7 + SDO8 + SDO9 + SDO10 + SDO11 + SDO12 + SDO13 + SDO14 + SDO15 + SDO16)
+data$SDOtotal <- as.numeric(as.character((SDO1 + SDO2 + SDO3 + SDO4 + SDO5 + SDO6 + SDO7 + SDO8 + SDO9 + SDO10 + SDO11 + SDO12 + SDO13 + SDO14 + SDO15 + SDO16)))
 
 detach(data)
 ```
