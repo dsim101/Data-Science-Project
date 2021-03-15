@@ -38,7 +38,6 @@ data <- data %>% filter(botcha1 == "The moon is made of green cheese", botcha2 =
 ```
 
 ```{r SDO scale cleaning}
-
 reverseCode <- function(var) {
   var <- recode(var, '7=1 ; 6=2 ; 5=3 ; 4=4 ; 3=5 ; 2=6 ; 1=7')
 }
