@@ -4,6 +4,21 @@ author: "Deja Simon"
 date: "3/10/2021"
 output: html_document
 ---
+```{r analysis functions}
+tTest <- function(group1, group2){
+  t.test(group1,
+       group2,
+       paired=TRUE,
+       conf.level=0.95)
+}
+
+cohenD <- function(group1, group2){
+  cohen.d(group1,
+       group2,
+       paired=TRUE,
+       conf.level=0.95)
+}
+```
 
 ```{r signal detection analyses - all data}
 cf <- black
@@ -15,38 +30,19 @@ cf$correct_latinx <- cf$Latinx_hits + cf$Latinx_crs
 # number correct analysis (total sample)
 describe(cf[,c("correct_white","correct_black", "correct_latinx")])
 
+attach(cf)
 # White vs. Black
-t.test(cf$correct_white,
-       cf$correct_black,
-       paired=TRUE,
-       conf.level=0.95)
-
-cohen.d(cf$correct_white,
-        cf$correct_black,
-        paired=TRUE,
-        conf.level=0.95)
+tTest(correct_white, correct_black)
+cohenD(correct_white, correct_black)
 
 # White vs. Latinx
-t.test(cf$correct_white,
-       cf$correct_latinx,
-       paired=TRUE,
-       conf.level=0.95)
-
-cohen.d(cf$correct_white,
-        cf$correct_latinx,
-        paired=TRUE,
-        conf.level=0.95)
+tTest(correct_white, correct_latinx)
+cohenD(correct_white, correct_latinx)
 
 # Black vs. Latinx
-t.test(cf$correct_black,
-       cf$correct_latinx,
-       paired=TRUE,
-       conf.level=0.95)
-
-cohen.d(cf$correct_black,
-        cf$correct_latinx,
-        paired=TRUE,
-        conf.level=0.95)
+tTest(correct_black, correct_latinx)
+cohenD(correct_black, correct_latinx)
+detach(cf)
 
 describe(cf[,c("White_hits", "White_crs", "White_fas", "White_misses",
                "Black_hits", "Black_crs", "Black_fas", "Black_misses", "Latinx_hits", "Latinx_crs", "Latinx_fas", "Latinx_misses")])
@@ -98,85 +94,39 @@ describe(cf[,c("whiteD", "blackD", "latinxD", "whiteC", "blackC", "latinxC")])
 
 # d' analysis
 
+attach(cf)
 # White vs. Black
-t.test(cf$whiteD,
-       cf$blackD,
-       paired=TRUE,
-       conf.level=0.95)
-
-cohen.d(cf$whiteD,
-        cf$blackD,
-        paired=TRUE,
-        conf.level=0.95)
-
-cor.test(cf$whiteD,cf$blackD)
+tTest(whiteD, blackD)
+cohenD(whiteD, blackD)
+cor.test(whiteD, blackD)
 
 # White vs. Latinx
-t.test(cf$whiteD,
-       cf$latinxD,
-       paired=TRUE,
-       conf.level=0.95)
-
-cohen.d(cf$whiteD,
-        cf$latinxD,
-        paired=TRUE,
-        conf.level=0.95)
-
-cor.test(cf$whiteD,cf$latinxD)
+tTest(whiteD, latinxD)
+cohenD(whiteD, latinxD)
+cor.test(whiteD, latinxD)
 
 # Black vs. Latinx
-t.test(cf$blackD,
-       cf$latinxD,
-       paired=TRUE,
-       conf.level=0.95)
+tTest(blackD, latinxD)
+cohenD(blackD, latinxD)
+cor.test(blackD, latinxD)
 
-cohen.d(cf$blackD,
-        cf$latinxD,
-        paired=TRUE,
-        conf.level=0.95)
-
-cor.test(cf$blackD,cf$latinxD)
 
 # c analysis
 
 # White vs. Black
-t.test(cf$whiteC,
-       cf$blackC,
-       paired=TRUE,
-       conf.level=0.95)
-
-cohen.d(cf$whiteC,
-        cf$blackC,
-        paired=TRUE,
-        conf.level=0.95)
-
-cor.test(cf$whiteC,cf$blackC)
+tTest(whiteC, blackC)
+cohenD(whiteC, blackC)
+cor.test(whiteC, blackC)
 
 # White vs. Latinx
-t.test(cf$whiteC,
-       cf$latinxC,
-       paired=TRUE,
-       conf.level=0.95)
-
-cohen.d(cf$whiteC,
-        cf$latinxC,
-        paired=TRUE,
-        conf.level=0.95)
-
-cor.test(cf$whiteC,cf$latinxC)
+tTest(whiteC, latinxC)
+cohenD(whiteC, latinxC)
+cor.test(whiteC, latinxC)
 
 # Black vs. Latinx
-t.test(cf$blackC,
-       cf$latinxC,
-       paired=TRUE,
-       conf.level=0.95)
-
-cohen.d(cf$blackC,
-        cf$latinxC,
-        paired=TRUE,
-        conf.level=0.95)
-
-cor.test(cf$blackC,cf$latinxC)
+tTest(blackC, latinxC)
+cohenD(blackC, latinxC)
+cor.test(blackC, latinxC)
 ```
 
 ```{r graphing - all data}
@@ -292,7 +242,7 @@ cf$C.latinxstim <- cf$latinxC
 
 cf <- cf %>% mutate(SDO_cat = ifelse(SDO_total == min(SDO_total), "low", ifelse(SDO_total >= mean(SDO_total)+sd(SDO_total), "high", "avg")))      
 
-cf.long <- cf %>% select("ResponseID", "D.whitestim", "D.blackstim", "C.whitestim", "C.blackstim", "D.latinxstim", "C.latinxstim", "stimGender", "SDO_cat", "SDO_total")
+cf.long <- cf %>% select("ResponseId", "D.whitestim", "D.blackstim", "C.whitestim", "C.blackstim", "D.latinxstim", "C.latinxstim", "stimGender", "SDO_cat", "SDO_total")
 
 #"times" refers to stimulus type
 cf.long <- reshape(cf.long, varying=2:7, times=c("whitestim", "blackstim", "latinxstim"), direction="long")
