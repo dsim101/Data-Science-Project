@@ -5,35 +5,6 @@ date: "3/10/2021"
 output: html_document
 ---
 
-```{r split half reliability of recog phase}
-# Female stimuli
-data.recog.f <- select(data, starts_with("RWF"), starts_with("RBF"), starts_with("RLF"))
-data.recog.f <- data.recog.f %>% filter(RWF01 != "")
-data.recog.f <- mutate_all(data.recog.f, function(x) as.numeric(as.character(x)))
-
-score.e.f <- rowMeans(data.recog.f[, c(TRUE, FALSE)])
-score.o.f <- rowMeans(data.recog.f[, c(FALSE, TRUE)])
-
-r.f <- cor(score.e.f, score.o.f)
-
-# Split half formula
-(2*r.f) / (1 + r.f)
-
-
-# Male stimuli
-data.recog.m <- select(data, starts_with("RWM"), starts_with("RBM"), starts_with("RLM"))
-data.recog.m <- data.recog.m %>% filter(RWM01 != "")
-data.recog.m <- mutate_all(data.recog.m, function(x) as.numeric(as.character(x)))
-
-score.e.m <- rowMeans(data.recog.m[, c(TRUE, FALSE)])
-score.o.m <- rowMeans(data.recog.m[, c(FALSE, TRUE)])
-
-r.m <- cor(score.e.m, score.o.m)
-
-# Split half formula
-(2*r.m) / (1 + r.m)
-```
-
 ```{r parsing raw data into correct/incorrect - F stim}
 data.femstim <- data %>% filter(RWF01 != "")
 
@@ -82,8 +53,8 @@ fem.cf.nodup[is.na(fem.cf.nodup)] <- 0
 # 1 = yes, seen  
 # 2 = no, not seen 
 
-fem.cfBasic <- fem.cf.nodup %>% mutate(Correct = case_when(Response != "" & res == "1" | res == "Yes" ~ 1, Response == "" & res == "2" | res == "No" ~ 2, TRUE ~ 0),
-                          Incorrect = case_when(Response == "" & res == "1" | res == "Yes" ~ 1, Response != "" & res == "2" | res == "No" ~ 2, TRUE ~ 0))
+fem.cfBasic <- fem.cf.nodup %>% mutate(Correct = case_when(Response != "" & res == "1" | res == "Yes" ~ 1, Response == "0" & res == "2" | res == "No" ~ 2, TRUE ~ 0),
+                          Incorrect = case_when(Response == "0" & res == "1" | res == "Yes" ~ 1, Response != "" & res == "2" | res == "No" ~ 2, TRUE ~ 0))
 
 
 fem.cfBasic$Type <- ifelse(grepl("X", fem.cfBasic$`Stimuli Race`, ignore.case = T), "White",
@@ -142,8 +113,8 @@ male.cf.nodup[is.na(male.cf.nodup)] <- 0
 # 1 = yes, seen  
 # 2 = no, not seen 
 
-male.cfBasic <- male.cf.nodup %>% mutate(Correct = case_when(Response != "" & res == "1" | res == "Yes" ~ 1, Response == "" & res == "2" | res == "No" ~ 2, TRUE ~ 0),
-                          Incorrect = case_when(Response == "" & res == "1" | res == "Yes" ~ 1, Response != "" & res == "2" | res == "No" ~ 2, TRUE ~ 0))
+male.cfBasic <- male.cf.nodup %>% mutate(Correct = case_when(Response != "" & res == "1" | res == "Yes" ~ 1, Response == "0" & res == "2" | res == "No" ~ 2, TRUE ~ 0),
+                          Incorrect = case_when(Response == "0" & res == "1" | res == "Yes" ~ 1, Response != "" & res == "2" | res == "No" ~ 2, TRUE ~ 0))
 
 
 male.cfBasic$Type <- ifelse(grepl("X", male.cfBasic$`Stimuli Race`, ignore.case = T), "White",
@@ -154,53 +125,26 @@ male.cfBasic$Type <- ifelse(grepl("X", male.cfBasic$`Stimuli Race`, ignore.case 
 male.cfBasic <- male.cfBasic %>% select(ResponseId, `Stimuli Race`, Type, Response, Test, res, Correct, Incorrect)
 ```
 
-```{r}
-num_of_hits_white <- fem.cfBasic %>% group_by(ResponseId) %>% mutate(hits_white = case_when(Correct == '1' & Type == "White" ~ 1, TRUE ~ 0)) %>% tally(hits_white)
+```{r response frequencies function}
+sigDet <- function(data, type) {
+num_of_hits <- data %>% group_by(ResponseId) %>% mutate(hits = case_when(Correct == '1' & Type == type ~ 1, TRUE ~ 0)) %>% tally(hits) 
 
-answer_array <- c("Correct", "Incorrect")
-cor_array <- c("1", "2")
-type_array <- c("White", "Black", "Latinx")
+num_of_cr <- data %>% group_by(ResponseId) %>% mutate(cr = case_when(Correct == '2' & Type == type ~ 1, TRUE ~ 0)) %>% tally(cr)
 
-for(k in answer_array){
-for(i in cor_array) {
-  for (j in type_array) {
-    if(k == "Correct" & i == "1") {
-      label <- "hits"
-    } else if(k == "Correct" & i == "2") {
-      label <- "cr"
-    } else if(k == "Incorrect" & i == "1") {
-      label <- "fa"
-    } else if(k == "Incorrect" & i == "2") {
-      label <- "miss"
-    }
-    name <- paste0("num_of_", label, "_",j)
-    if(k == "Correct") {
-    curr_file <- fem.cfBasic %>% group_by(ResponseId) %>%   mutate(hits_white = case_when(Correct == i & Type == j ~ 1, TRUE ~ 0)) %>% tally(hits_white)
-    } else if(k == "Incorrect") {
-    curr_file <- fem.cfBasic %>% group_by(ResponseId) %>%   mutate(hits_white = case_when(Incorrect == i & Type == j ~ 1, TRUE ~ 0)) %>% tally(hits_white)
-    }
-  }
-}
+num_of_fa <- data %>% group_by(ResponseId) %>% mutate(fa = case_when(Incorrect == '1' & Type == type ~ 1, TRUE ~ 0)) %>% tally(fa) 
+
+num_of_miss <- data %>% group_by(ResponseId) %>% mutate(miss = case_when(Incorrect == '2' & Type == type ~ 1, TRUE ~ 0)) %>% tally(miss) 
+
+cbind(num_of_hits, num_of_cr$n, num_of_fa$n, num_of_miss$n) %>% set_names("ResponseId", paste0(type,"_hits"), paste0(type,"_crs"), paste0(type,"_fas"), paste0(type,"_misses"))
 }
 ```
 
-```{r}
-sigDet <- function(data, type) {
-num_of_hits_ <- data %>% group_by(ResponseId) %>% mutate(hits_white = case_when(Correct == '1' & Type == type ~ 1, TRUE ~ 0)) %>% tally(hits_white) 
+```{r response frequencies - F stim}
+f_exp <- cbind(sigDet(fem.cfBasic, "White"), sigDet(fem.cfBasic, "Black"), sigDet(fem.cfBasic, "Latinx"), data.femstim$race, data.femstim$age, data.femstim$IPAddress, data.femstim$gender, data.femstim$SDOtotal)
 
-label <- paste0("num_of_hits_", type)
-file <- assign(label, num_of_hits_)
+f_cf_all <- f_exp[!duplicated(as.list(f_exp))]
 
-num_of_cr_ <- data %>% group_by(ResponseId) %>% mutate(cr_white = case_when(Correct == '2' & Type == type ~ 1, TRUE ~ 0)) %>% tally(cr_white) 
-
-num_of_fa_ <- data %>% group_by(ResponseId) %>% mutate(fa_white = case_when(Incorrect == '1' & Type == type ~ 1, TRUE ~ 0)) %>% tally(fa_white) 
-
-num_of_miss_ <- data %>% group_by(ResponseId) %>% mutate(miss_white = case_when(Incorrect == '2' & Type == type ~ 1, TRUE ~ 0)) %>% tally(miss_white) 
-
-cbind(num_of_hits_, num_of_cr_$n, num_of_fa_$n, num_of_miss_$n) %>% set_names("ResponseId", "hits", "crs", "fas", "misses")
-}
-
-sigDet(fem.cfBasic, "White")
+f_cf_all <- f_cf_all %>% rename(race = data.femstim$race)
 ```
 
 ```{r response frequencies - F stim}
