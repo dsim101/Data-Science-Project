@@ -5,7 +5,6 @@ date: "3/10/2021"
 output: html_document
 ---
 ```{r packages}
-library(tidyverse)
 library(data.table)
 require(car)
 library(reshape2)
@@ -22,6 +21,7 @@ library(nlme)
 library(Rmisc)
 library(emmeans)
 library(here)
+library(tidyverse)
 ```
 
 ```{r loading data}
@@ -51,7 +51,6 @@ asNumeric <- function(var) {
 
 data[, c("SDO1", "SDO2", "SDO3", "SDO4", "SDO5", "SDO6", "SDO7", "SDO8", "SDO9", "SDO10", "SDO11", "SDO12", "SDO13", "SDO14", "SDO15", "SDO16")] <- apply(data[, c("SDO1", "SDO2", "SDO3", "SDO4", "SDO5", "SDO6", "SDO7", "SDO8", "SDO9", "SDO10", "SDO11", "SDO12", "SDO13", "SDO14", "SDO15", "SDO16")], 2, asNumeric)
 
-
 # making a composite variable
 attach(data)
 data$SDOtotal <- as.numeric(as.character((SDO1 + SDO2 + SDO3 + SDO4 + SDO5 + SDO6 + SDO7 + SDO8 + SDO9 + SDO10 + SDO11 + SDO12 + SDO13 + SDO14 + SDO15 + SDO16)))
@@ -69,4 +68,35 @@ boxplot(data$SDOtotal)
 # getting the reliability of the scale
 SDO <- data %>% select(starts_with("SDO"))
 summary(alpha(SDO, check.keys = FALSE))
+```
+
+```{r split half reliability of recog phase}
+# Female stimuli
+data.recog.f <- select(data, starts_with("RWF"), starts_with("RBF"), starts_with("RLF"))
+data.recog.f <- data.recog.f %>% filter(RWF01 != "")
+data.recog.f <- mutate_all(data.recog.f, function(x) as.numeric(as.character(x)))
+data.recog.f <- as.data.frame(data.recog.f)
+
+score.e.f <- rowMeans(data.recog.f[, c(TRUE, FALSE)])
+score.o.f <- rowMeans(data.recog.f[, c(FALSE, TRUE)])
+
+r.f <- cor(score.e.f, score.o.f)
+
+# Split half formula
+(2*r.f) / (1 + r.f)
+
+
+# Male stimuli
+data.recog.m <- select(data, starts_with("RWM"), starts_with("RBM"), starts_with("RLM"))
+data.recog.m <- data.recog.m %>% filter(RWM01 != "")
+data.recog.m <- mutate_all(data.recog.m, function(x) as.numeric(as.character(x)))
+data.recog.m <- as.data.frame(data.recog.m)
+
+score.e.m <- rowMeans(data.recog.m[, c(TRUE, FALSE)])
+score.o.m <- rowMeans(data.recog.m[, c(FALSE, TRUE)])
+
+r.m <- cor(score.e.m, score.o.m)
+
+# Split half formula
+(2*r.m) / (1 + r.m)
 ```
