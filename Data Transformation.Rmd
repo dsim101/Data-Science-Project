@@ -140,11 +140,11 @@ cbind(num_of_hits, num_of_cr$n, num_of_fa$n, num_of_miss$n) %>% set_names("Respo
 ```
 
 ```{r response frequencies - F stim}
-f_exp <- cbind(sigDet(fem.cfBasic, "White"), sigDet(fem.cfBasic, "Black"), sigDet(fem.cfBasic, "Latinx"), data.femstim$race, data.femstim$age, data.femstim$IPAddress, data.femstim$gender, data.femstim$SDOtotal)
+f_exp <- cbind(sigDet(fem.cfBasic, "White"), sigDet(fem.cfBasic, "Black"), sigDet(fem.cfBasic, "Latinx"), data.femstim$race, data.femstim$age, data.femstim$IPAddress, data.femstim$gender, data.femstim$SDO_total)
 
 f_cf_all <- f_exp[!duplicated(as.list(f_exp))]
 
-f_cf_all <- f_cf_all %>% mutate(race = data.femstim$race, age = data.femstim$age, IPAddress = data.femstim$IPAddress, gender = data.femstim$gender, SDOtotal = data.femstim$SDOtotal) %>% subset(select = -c(`data.femstim$race`, `data.femstim$age`, `data.femstim$IPAddress`, `data.femstim$gender`, `data.femstim$SDOtotal`))
+f_cf_all <- f_cf_all %>% mutate(race = data.femstim$race, age = data.femstim$age, IPAddress = data.femstim$IPAddress, gender = data.femstim$gender, SDO_total = data.femstim$SDO_total) %>% subset(select = -c(`data.femstim$race`, `data.femstim$age`, `data.femstim$IPAddress`, `data.femstim$gender`, `data.femstim$SDO_total`))
 
 
 attach(f_cf_all)
@@ -170,11 +170,11 @@ f_dat$stimGender <- "female"
 ```
 
 ```{r response frequencies - M stim}
-m_exp <- cbind(sigDet(male.cfBasic, "White"), sigDet(male.cfBasic, "Black"), sigDet(male.cfBasic, "Latinx"), data.malestim$race, data.malestim$age, data.malestim$IPAddress, data.malestim$gender, data.malestim$SDOtotal)
+m_exp <- cbind(sigDet(male.cfBasic, "White"), sigDet(male.cfBasic, "Black"), sigDet(male.cfBasic, "Latinx"), data.malestim$race, data.malestim$age, data.malestim$IPAddress, data.malestim$gender, data.malestim$SDO_total)
 
 m_cf_all <- m_exp[!duplicated(as.list(m_exp))]
 
-m_cf_all <- m_cf_all %>% mutate(race = data.malestim$race, age = data.malestim$age, IPAddress = data.malestim$IPAddress, gender = data.malestim$gender, SDOtotal = data.malestim$SDOtotal) %>% subset(select = -c(`data.malestim$race`, `data.malestim$age`, `data.malestim$IPAddress`, `data.malestim$gender`, `data.malestim$SDOtotal`))
+m_cf_all <- m_cf_all %>% mutate(race = data.malestim$race, age = data.malestim$age, IPAddress = data.malestim$IPAddress, gender = data.malestim$gender, SDO_total = data.malestim$SDO_total) %>% subset(select = -c(`data.malestim$race`, `data.malestim$age`, `data.malestim$IPAddress`, `data.malestim$gender`, `data.malestim$SDO_total`))
 
 
 attach(m_cf_all)
