@@ -8,13 +8,12 @@ output: html_document
 ```{r signal detection analyses - all data}
 cf <- black
 
-cf$correct_white <- cf$number_of_hits_white + cf$number_of_cr_white
-cf$correct_black <- cf$number_of_hits_black + cf$number_of_cr_black
-cf$correct_latinx <- cf$number_of_hits_latinx + cf$number_of_cr_latinx
+cf$correct_white <- cf$White_hits + cf$White_crs
+cf$correct_black <- cf$Black_hits + cf$Black_crs
+cf$correct_latinx <- cf$Latinx_hits + cf$Latinx_crs
 
 # number correct analysis (total sample)
 describe(cf[,c("correct_white","correct_black", "correct_latinx")])
-
 
 # White vs. Black
 t.test(cf$correct_white,
@@ -49,26 +48,26 @@ cohen.d(cf$correct_black,
         paired=TRUE,
         conf.level=0.95)
 
-describe(cf[,c("number_of_hits_white", "number_of_miss_white", "number_of_cr_white", "number_of_fa_white",
-               "number_of_hits_black", "number_of_miss_black", "number_of_cr_black", "number_of_fa_black", "number_of_hits_latinx", "number_of_miss_latinx", "number_of_cr_latinx", "number_of_fa_latinx")])
+describe(cf[,c("White_hits", "White_crs", "White_fas", "White_misses",
+               "Black_hits", "Black_crs", "Black_fas", "Black_misses", "Latinx_hits", "Latinx_crs", "Latinx_fas", "Latinx_misses")])
 
 
 #36 is the max possible number of responses in each category.
 #36 hits would mean all right. 36 false alarms would be all wrong.
 #So the total (36x8=288) is double the total number of trials
 
-cf$white_hits <- cf$number_of_hits_white/36
-cf$white_cr <- cf$number_of_cr_white/36
-cf$white_fa <- cf$number_of_fa_white/36
-cf$white_miss <- cf$number_of_miss_white/36
-cf$black_hits <- cf$number_of_hits_black/36
-cf$black_cr <- cf$number_of_cr_black/36
-cf$black_fa <- cf$number_of_fa_black/36
-cf$black_miss <- cf$number_of_miss_black/36
-cf$latinx_hits <- cf$number_of_hits_latinx/36
-cf$latinx_cr <- cf$number_of_cr_latinx/36
-cf$latinx_fa <- cf$number_of_fa_latinx/36
-cf$latinx_miss <- cf$number_of_miss_latinx/36
+cf$white_hits <- cf$White_hits/36
+cf$white_cr <- cf$White_crs/36
+cf$white_fa <- cf$White_fas/36
+cf$white_miss <- cf$White_misses/36
+cf$black_hits <- cf$Black_hits/36
+cf$black_cr <- cf$Black_crs/36
+cf$black_fa <- cf$Black_fas/36
+cf$black_miss <- cf$Black_misses/36
+cf$latinx_hits <- cf$Latinx_hits/36
+cf$latinx_cr <- cf$Latinx_crs/36
+cf$latinx_fa <- cf$Latinx_fas/36
+cf$latinx_miss <- cf$Latinx_misses/36
 
 describe(cf[,c("white_hits","black_hits", "latinx_hits", "white_cr","black_cr", "latinx_cr", "white_fa","black_fa", "latinx_fa", "white_miss","black_miss", "latinx_miss")])
 
