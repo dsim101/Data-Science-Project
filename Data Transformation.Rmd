@@ -144,163 +144,68 @@ f_exp <- cbind(sigDet(fem.cfBasic, "White"), sigDet(fem.cfBasic, "Black"), sigDe
 
 f_cf_all <- f_exp[!duplicated(as.list(f_exp))]
 
-f_cf_all <- f_cf_all %>% rename(race = data.femstim$race)
-```
+f_cf_all <- f_cf_all %>% mutate(race = data.femstim$race, age = data.femstim$age, IPAddress = data.femstim$IPAddress, gender = data.femstim$gender, SDOtotal = data.femstim$SDOtotal) %>% subset(select = -c(`data.femstim$race`, `data.femstim$age`, `data.femstim$IPAddress`, `data.femstim$gender`, `data.femstim$SDOtotal`))
 
-```{r response frequencies - F stim}
-# White stimuli
-num_of_hits_white <- fem.cfBasic %>% group_by(ResponseId) %>% mutate(hits_white = case_when(Correct == '1' & Type == "White" ~ 1, TRUE ~ 0)) %>% tally(hits_white)
-
-num_of_cr_white <- fem.cfBasic %>% group_by(ResponseId) %>% mutate(cr_white = case_when(Correct == '2' & Type == "White" ~ 1, TRUE ~ 0)) %>% tally(cr_white)
-
-num_of_fa_white <- fem.cfBasic %>% group_by(ResponseId) %>% mutate(fa_white = case_when(Incorrect == '1' & Type == "White" ~ 1, TRUE ~ 0)) %>% tally(fa_white)
-
-num_of_miss_white <- fem.cfBasic %>% group_by(ResponseId) %>% mutate(miss_white = case_when(Incorrect == '2' & Type == "White" ~ 1, TRUE ~ 0)) %>% tally(miss_white)
-
-
-# Black stimuli
-num_of_hits_black <- fem.cfBasic %>% group_by(ResponseId) %>% mutate(hits_black = case_when(Correct == '1' & Type == "Black" ~ 1, TRUE ~ 0)) %>% tally(hits_black)
-
-num_of_cr_black <- fem.cfBasic %>% group_by(ResponseId) %>% mutate(cr_black = case_when(Correct == '2' & Type == "Black" ~ 1, TRUE ~ 0)) %>% tally(cr_black)
-
-num_of_fa_black <- fem.cfBasic %>% group_by(ResponseId) %>% mutate(fa_black = case_when(Incorrect == '1' & Type == "Black" ~ 1, TRUE ~ 0)) %>% tally(fa_black)
-
-num_of_miss_black <- fem.cfBasic %>% group_by(ResponseId) %>% mutate(miss_black = case_when(Incorrect == '2' & Type == "Black" ~ 1, TRUE ~ 0)) %>% tally(miss_black)
-
-
-# Latinx stimuli
-num_of_hits_latinx <- fem.cfBasic %>% group_by(ResponseId) %>% mutate(hits_latinx = case_when(Correct == '1' & Type == "Latinx" ~ 1, TRUE ~ 0)) %>% tally(hits_latinx)
-
-num_of_cr_latinx <- fem.cfBasic %>% group_by(ResponseId) %>% mutate(cr_latinx = case_when(Correct == '2' & Type == "Latinx" ~ 1, TRUE ~ 0)) %>% tally(cr_latinx)
-
-num_of_fa_latinx <- fem.cfBasic %>% group_by(ResponseId) %>% mutate(fa_latinx = case_when(Incorrect == '1' & Type == "Latinx" ~ 1, TRUE ~ 0)) %>% tally(fa_latinx)
-
-num_of_miss_latinx <- fem.cfBasic %>% group_by(ResponseId) %>% mutate(miss_latinx = case_when(Incorrect == '2' & Type == "Latinx" ~ 1, TRUE ~ 0)) %>% tally(miss_latinx)
-
-
-# new dataframe
-f_exp <- cbind(num_of_hits_white, num_of_cr_white, num_of_fa_white, num_of_miss_white,
-            num_of_hits_black, num_of_cr_black, num_of_fa_black, num_of_miss_black, num_of_hits_latinx, num_of_cr_latinx, num_of_fa_latinx, num_of_miss_latinx, data.femstim$race, data.femstim$age, data.femstim$IPAddress, data.femstim$gender, data.femstim$SDOtotal)
-
-
-f_cf_all <- f_exp[!duplicated(as.list(f_exp))]
-
-names(f_cf_all) <- c("ResponseID", "number_of_hits_white",
-                   "number_of_cr_white",
-                   "number_of_fa_white",
-                   "number_of_miss_white",
-                   "number_of_hits_black",
-                   "number_of_cr_black",
-                   "number_of_fa_black",
-                   "number_of_miss_black", "number_of_hits_latinx",
-                   "number_of_cr_latinx",
-                   "number_of_fa_latinx",
-                   "number_of_miss_latinx",
-                   "race", "age", "ipAddress", "gender", "SDO_total")
 
 attach(f_cf_all)
-f_cf_all$total <- number_of_hits_white +
-  number_of_cr_white +
-  number_of_fa_white +
-  number_of_miss_white +
-  number_of_hits_black +
-  number_of_cr_black +
-  number_of_fa_black +
-  number_of_miss_black +
-  number_of_hits_latinx +
-  number_of_cr_latinx +
-  number_of_fa_latinx +
-  number_of_miss_latinx
-# should sum to 144; filtering out people who don't add up to that below
-
+f_cf_all$total <- 
+  White_hits +
+  White_fas +
+  White_crs +
+  White_misses +
+  Black_hits +
+  Black_fas +
+  Black_crs +
+  Black_misses +
+  Latinx_hits +
+  Latinx_fas +
+  Latinx_crs +
+  Latinx_misses
+# should sum to 216; filtering out people who don't add up to that below
 detach(f_cf_all)
 
-f_dat <- f_cf_all %>% filter(total == "144")
+f_dat <- f_cf_all %>% filter(total == "216")
 
 f_dat$stimGender <- "female"
 ```
 
 ```{r response frequencies - M stim}
-# White stimuli
-num_of_hits_white <- male.cfBasic %>% group_by(ResponseId) %>% mutate(hits_white = case_when(Correct == '1' & Type == "White" ~ 1, TRUE ~ 0)) %>% tally(hits_white)
-
-num_of_cr_white <- male.cfBasic %>% group_by(ResponseId) %>% mutate(cr_white = case_when(Correct == '2' & Type == "White" ~ 1, TRUE ~ 0)) %>% tally(cr_white)
-
-num_of_fa_white <- male.cfBasic %>% group_by(ResponseId) %>% mutate(fa_white = case_when(Incorrect == '1' & Type == "White" ~ 1, TRUE ~ 0)) %>% tally(fa_white)
-
-num_of_miss_white <- male.cfBasic %>% group_by(ResponseId) %>% mutate(miss_white = case_when(Incorrect == '2' & Type == "White" ~ 1, TRUE ~ 0)) %>% tally(miss_white)
-
-
-# Black stimuli
-num_of_hits_black <- male.cfBasic %>% group_by(ResponseId) %>% mutate(hits_black = case_when(Correct == '1' & Type == "Black" ~ 1, TRUE ~ 0)) %>% tally(hits_black)
-
-num_of_cr_black <- male.cfBasic %>% group_by(ResponseId) %>% mutate(cr_black = case_when(Correct == '2' & Type == "Black" ~ 1, TRUE ~ 0)) %>% tally(cr_black)
-
-num_of_fa_black <- male.cfBasic %>% group_by(ResponseId) %>% mutate(fa_black = case_when(Incorrect == '1' & Type == "Black" ~ 1, TRUE ~ 0)) %>% tally(fa_black)
-
-num_of_miss_black <- male.cfBasic %>% group_by(ResponseId) %>% mutate(miss_black = case_when(Incorrect == '2' & Type == "Black" ~ 1, TRUE ~ 0)) %>% tally(miss_black)
-
-
-# Latinx stimuli
-num_of_hits_latinx <- male.cfBasic %>% group_by(ResponseId) %>% mutate(hits_latinx = case_when(Correct == '1' & Type == "Latinx" ~ 1, TRUE ~ 0)) %>% tally(hits_latinx)
-
-num_of_cr_latinx <- male.cfBasic %>% group_by(ResponseId) %>% mutate(cr_latinx = case_when(Correct == '2' & Type == "Latinx" ~ 1, TRUE ~ 0)) %>% tally(cr_latinx)
-
-num_of_fa_latinx <- male.cfBasic %>% group_by(ResponseId) %>% mutate(fa_latinx = case_when(Incorrect == '1' & Type == "Latinx" ~ 1, TRUE ~ 0)) %>% tally(fa_latinx)
-
-num_of_miss_latinx <- male.cfBasic %>% group_by(ResponseId) %>% mutate(miss_latinx = case_when(Incorrect == '2' & Type == "Latinx" ~ 1, TRUE ~ 0)) %>% tally(miss_latinx)
-
-
-# new dataframe
-m_exp <- cbind(num_of_hits_white, num_of_cr_white, num_of_fa_white, num_of_miss_white,
-            num_of_hits_black, num_of_cr_black, num_of_fa_black, num_of_miss_black, num_of_hits_latinx, num_of_cr_latinx, num_of_fa_latinx, num_of_miss_latinx, data.malestim$race, data.malestim$age, data.malestim$IPAddress, data.malestim$gender, data.malestim$SDOtotal)
-
+m_exp <- cbind(sigDet(male.cfBasic, "White"), sigDet(male.cfBasic, "Black"), sigDet(male.cfBasic, "Latinx"), data.malestim$race, data.malestim$age, data.malestim$IPAddress, data.malestim$gender, data.malestim$SDOtotal)
 
 m_cf_all <- m_exp[!duplicated(as.list(m_exp))]
 
-names(m_cf_all) <- c("ResponseID", "number_of_hits_white",
-                   "number_of_cr_white",
-                   "number_of_fa_white",
-                   "number_of_miss_white",
-                   "number_of_hits_black",
-                   "number_of_cr_black",
-                   "number_of_fa_black",
-                   "number_of_miss_black", "number_of_hits_latinx",
-                   "number_of_cr_latinx",
-                   "number_of_fa_latinx",
-                   "number_of_miss_latinx",
-                   "race", "age", "ipAddress", "gender", "SDO_total")
+m_cf_all <- m_cf_all %>% mutate(race = data.malestim$race, age = data.malestim$age, IPAddress = data.malestim$IPAddress, gender = data.malestim$gender, SDOtotal = data.malestim$SDOtotal) %>% subset(select = -c(`data.malestim$race`, `data.malestim$age`, `data.malestim$IPAddress`, `data.malestim$gender`, `data.malestim$SDOtotal`))
+
 
 attach(m_cf_all)
-m_cf_all$total <- number_of_hits_white +
-  number_of_cr_white +
-  number_of_fa_white +
-  number_of_miss_white +
-  number_of_hits_black +
-  number_of_cr_black +
-  number_of_fa_black +
-  number_of_miss_black +
-  number_of_hits_latinx +
-  number_of_cr_latinx +
-  number_of_fa_latinx +
-  number_of_miss_latinx
-# should sum to 144; filtering out people who don't add up to that below
-
+m_cf_all$total <- 
+  White_hits +
+  White_fas +
+  White_crs +
+  White_misses +
+  Black_hits +
+  Black_fas +
+  Black_crs +
+  Black_misses +
+  Latinx_hits +
+  Latinx_fas +
+  Latinx_crs +
+  Latinx_misses
+# should sum to 216; filtering out people who don't add up to that below
 detach(m_cf_all)
 
-m_dat <- m_cf_all %>% filter(total == "144")
+m_dat <- m_cf_all %>% filter(total == "216")
 
 m_dat$stimGender <- "male"
-
-all_dat <- rbind(f_dat, m_dat)
 ```
 
 ```{r final sample descriptives and Ns}
+all_dat <- rbind(f_dat, m_dat)
+
 # only Black Ss
 black <- all_dat %>% filter(race == "1")
 
-setwd("~/Desktop")
-write.csv(black, file = "GIRA2_clean.csv", row.names = FALSE)
+black %>% write_csv("data_cleaned/GIRA2_clean.csv")
 
 # gender: 1 = male, 2 = female, 3 = nonbinary
 count(black, vars = "gender")
