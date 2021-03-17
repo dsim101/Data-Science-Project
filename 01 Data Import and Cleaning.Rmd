@@ -41,14 +41,12 @@ data <- data %>% filter(botcha1 == "The moon is made of green cheese", botcha2 =
 reverseCode <- function(var) {
  var <- recode(var, `7`= 1, `6` = 2, `5` = 3, `4` = 4, `3` = 5, `2` = 6, `1` = 7)
 }
-
 data <- data %>% mutate(across(SDO1:SDO8, reverseCode))
 
 
 asNumeric <- function(var) {
  var <- as.numeric(as.character(var))
 }
-
 data <- data %>% mutate(across(SDO1:SDO16, asNumeric))
 
 
