@@ -1,0 +1,216 @@
+---
+title: "Data Transformation"
+author: "Deja Simon"
+date: "3/10/2021"
+output: html_document
+---
+
+```{r parsing raw data into correct/incorrect - F stim}
+data.femstim <- data %>% filter(RWF01 != "")
+
+# Learning Phase
+
+# X = White
+# Y = Latinx
+# Z = Black  
+
+# Female Stimuli
+learn.XF <- select(data.femstim, matches("ResponseId"), matches("Page.Submit"), -starts_with("YF"), -starts_with("ZF"), -starts_with("RXF"), -starts_with("RYF"), -starts_with("RZF"), -starts_with("RWF"),-starts_with("RLF"),-starts_with("RBF"), -starts_with("XM"), -starts_with("YM"), -starts_with("ZM"), -starts_with("RXM"), -starts_with("RYM"), -starts_with("RZM"), -starts_with("RWM"),-starts_with("RLM"),-starts_with("RBM"))
+
+learn.YF <- select(data.femstim, matches("ResponseId"), matches("Page.Submit"), -starts_with("XF"), -starts_with("ZF"), -starts_with("RXF"), -starts_with("RYF"), -starts_with("RZF"), -starts_with("RWF"),-starts_with("RLF"),-starts_with("RBF"), -starts_with("XM"), -starts_with("YM"), -starts_with("ZM"), -starts_with("RXM"), -starts_with("RYM"), -starts_with("RZM"), -starts_with("RWM"),-starts_with("RLM"),-starts_with("RBM"))
+
+learn.ZF <- select(data.femstim, matches("ResponseId"), matches("Page.Submit"), -starts_with("XF"), -starts_with("YF"), -starts_with("RXF"), -starts_with("RYF"), -starts_with("RZF"), -starts_with("RWF"),-starts_with("RLF"),-starts_with("RBF"), -starts_with("XM"), -starts_with("YM"), -starts_with("ZM"), -starts_with("RXM"), -starts_with("RYM"), -starts_with("RZM"), -starts_with("RWM"),-starts_with("RLM"),-starts_with("RBM"))
+
+fem.learn <- cbind(learn.XF, learn.YF, learn.ZF)
+
+fem.learn <- fem.learn[!duplicated(as.list(fem.learn))]
+
+fem.learn.phase <- fem.learn %>%
+  gather(matches("Page.submit"),key = "Stimuli Race", value = "Response")
+
+
+# Recognition Phase 
+fem.test <- select(data.femstim, matches("ResponseId"), starts_with("RWF"), starts_with("RLF"), starts_with("RBF"), -starts_with("RXF"), -starts_with("RYF"), -starts_with("RZF"), -starts_with("RXM"), -starts_with("RYM"), -starts_with("RZM"),-ends_with("Last.Click"), -ends_with("Click.Count"), -ends_with("Page.Submit"), -ends_with("First.Click"))
+
+fem.test.phase <- fem.test %>%
+  gather(starts_with("RW"), starts_with("RL"), starts_with("RB"), key = "Test", value = "res")
+
+
+# combining learning and recognition
+fem.dup.cf <- cbind(fem.learn.phase, fem.test.phase)
+
+
+# removing duplicate Response ID column
+fem.cf.nodup <- fem.dup.cf[!duplicated(as.list(fem.dup.cf))]
+
+fem.cf.nodup <- as.data.frame(fem.cf.nodup)
+
+fem.cf.nodup[is.na(fem.cf.nodup)] <- 0
+
+
+# Coding correct vs. incorrect
+
+# 1 = yes, seen  
+# 2 = no, not seen 
+
+fem.cfBasic <- fem.cf.nodup %>% mutate(Correct = case_when(Response != "" & res == "1" | res == "Yes" ~ 1, Response == "0" & res == "2" | res == "No" ~ 2, TRUE ~ 0),
+                          Incorrect = case_when(Response == "0" & res == "1" | res == "Yes" ~ 1, Response != "" & res == "2" | res == "No" ~ 2, TRUE ~ 0))
+
+
+fem.cfBasic$Type <- ifelse(grepl("X", fem.cfBasic$`Stimuli Race`, ignore.case = T), "White",
+                  ifelse(grepl("Z", fem.cfBasic$`Stimuli Race`, ignore.case = T), "Black", "Latinx"))
+
+
+# rearranging columns
+fem.cfBasic <- fem.cfBasic %>% select(ResponseId, `Stimuli Race`, Type, Response, Test, res, Correct, Incorrect)
+```
+
+```{r parsing raw data into correct/incorrect - M stim}
+data.malestim <- data %>% filter(RWM01 != "")
+
+# Learning Phase
+
+# X = White
+# Y = Latinx
+# Z = Black  
+
+# Male Stimuli
+learn.XM <- select(data.malestim, matches("ResponseId"), matches("Page.Submit"), -starts_with("YM"), -starts_with("ZM"), -starts_with("RXM"), -starts_with("RYM"), -starts_with("RZM"), -starts_with("RWM"),-starts_with("RLM"),-starts_with("RBM"), -starts_with("XF"), -starts_with("YF"), -starts_with("ZF"), -starts_with("RXF"), -starts_with("RYF"), -starts_with("RZF"), -starts_with("RWF"),-starts_with("RLF"),-starts_with("RBF"))
+
+learn.YM <- select(data.malestim, matches("ResponseId"), matches("Page.Submit"), -starts_with("XM"), -starts_with("ZM"), -starts_with("RXM"), -starts_with("RYM"), -starts_with("RZM"), -starts_with("RWM"),-starts_with("RLM"),-starts_with("RBM"), -starts_with("XF"), -starts_with("YF"), -starts_with("ZF"), -starts_with("RXF"), -starts_with("RYF"), -starts_with("RZF"), -starts_with("RWF"),-starts_with("RLF"),-starts_with("RBF"))
+
+learn.ZM <- select(data.malestim, matches("ResponseId"), matches("Page.Submit"), -starts_with("XM"), -starts_with("YM"), -starts_with("RXM"), -starts_with("RYM"), -starts_with("RZM"), -starts_with("RWM"),-starts_with("RLM"),-starts_with("RBM"), -starts_with("XF"), -starts_with("YF"), -starts_with("ZF"), -starts_with("RXF"), -starts_with("RYF"), -starts_with("RZF"), -starts_with("RWF"),-starts_with("RLF"),-starts_with("RBF"))
+
+male.learn <- cbind(learn.XM, learn.YM, learn.ZM)
+
+male.learn <- male.learn[!duplicated(as.list(male.learn))]
+
+male.learn.phase <- male.learn %>%
+  gather(matches("Page.submit"),key = "Stimuli Race", value = "Response")
+
+
+# Recognition Phase 
+male.test <- select(data.malestim, matches("ResponseId"), starts_with("RWM"), starts_with("RLM"), starts_with("RBM"), -starts_with("RXM"), -starts_with("RYM"), -starts_with("RZM"), -starts_with("RXF"), -starts_with("RYF"), -starts_with("RZF"),-ends_with("Last.Click"), -ends_with("Click.Count"), -ends_with("Page.Submit"), -ends_with("First.Click"))
+
+male.test.phase <- male.test %>%
+  gather(starts_with("RW"), starts_with("RL"), starts_with("RB"), key = "Test", value = "res")
+
+
+# combining learning and recognition
+male.dup.cf <- cbind(male.learn.phase, male.test.phase)
+
+
+# removing duplicate Response ID column
+male.cf.nodup <- male.dup.cf[!duplicated(as.list(male.dup.cf))]
+
+male.cf.nodup <- as.data.frame(male.cf.nodup)
+
+male.cf.nodup[is.na(male.cf.nodup)] <- 0
+
+
+# Coding correct vs. incorrect
+
+# 1 = yes, seen  
+# 2 = no, not seen 
+
+male.cfBasic <- male.cf.nodup %>% mutate(Correct = case_when(Response != "" & res == "1" | res == "Yes" ~ 1, Response == "0" & res == "2" | res == "No" ~ 2, TRUE ~ 0),
+                          Incorrect = case_when(Response == "0" & res == "1" | res == "Yes" ~ 1, Response != "" & res == "2" | res == "No" ~ 2, TRUE ~ 0))
+
+
+male.cfBasic$Type <- ifelse(grepl("X", male.cfBasic$`Stimuli Race`, ignore.case = T), "White",
+                  ifelse(grepl("Z", male.cfBasic$`Stimuli Race`, ignore.case = T), "Black", "Latinx"))
+
+
+# rearranging columns
+male.cfBasic <- male.cfBasic %>% select(ResponseId, `Stimuli Race`, Type, Response, Test, res, Correct, Incorrect)
+```
+
+```{r response frequencies function}
+sigDet <- function(data, type) {
+num_of_hits <- data %>% group_by(ResponseId) %>% mutate(hits = case_when(Correct == '1' & Type == type ~ 1, TRUE ~ 0)) %>% tally(hits) 
+
+num_of_cr <- data %>% group_by(ResponseId) %>% mutate(cr = case_when(Correct == '2' & Type == type ~ 1, TRUE ~ 0)) %>% tally(cr)
+
+num_of_fa <- data %>% group_by(ResponseId) %>% mutate(fa = case_when(Incorrect == '1' & Type == type ~ 1, TRUE ~ 0)) %>% tally(fa) 
+
+num_of_miss <- data %>% group_by(ResponseId) %>% mutate(miss = case_when(Incorrect == '2' & Type == type ~ 1, TRUE ~ 0)) %>% tally(miss) 
+
+cbind(num_of_hits, num_of_cr$n, num_of_fa$n, num_of_miss$n) %>% set_names("ResponseId", paste0(type,"_hits"), paste0(type,"_crs"), paste0(type,"_fas"), paste0(type,"_misses"))
+}
+```
+
+```{r response frequencies - F stim}
+f_exp <- cbind(sigDet(fem.cfBasic, "White"), sigDet(fem.cfBasic, "Black"), sigDet(fem.cfBasic, "Latinx"), data.femstim$race, data.femstim$age, data.femstim$IPAddress, data.femstim$gender, data.femstim$SDO_total)
+
+f_cf_all <- f_exp[!duplicated(as.list(f_exp))]
+
+f_cf_all <- f_cf_all %>% mutate(race = data.femstim$race, age = data.femstim$age, IPAddress = data.femstim$IPAddress, gender = data.femstim$gender, SDO_total = data.femstim$SDO_total) %>% subset(select = -c(`data.femstim$race`, `data.femstim$age`, `data.femstim$IPAddress`, `data.femstim$gender`, `data.femstim$SDO_total`))
+
+
+attach(f_cf_all)
+f_cf_all$total <- 
+  White_hits +
+  White_fas +
+  White_crs +
+  White_misses +
+  Black_hits +
+  Black_fas +
+  Black_crs +
+  Black_misses +
+  Latinx_hits +
+  Latinx_fas +
+  Latinx_crs +
+  Latinx_misses
+# should sum to 216; filtering out people who don't add up to that below
+detach(f_cf_all)
+
+f_dat <- f_cf_all %>% filter(total == "216")
+
+f_dat$stimGender <- "female"
+```
+
+```{r response frequencies - M stim}
+m_exp <- cbind(sigDet(male.cfBasic, "White"), sigDet(male.cfBasic, "Black"), sigDet(male.cfBasic, "Latinx"), data.malestim$race, data.malestim$age, data.malestim$IPAddress, data.malestim$gender, data.malestim$SDO_total)
+
+m_cf_all <- m_exp[!duplicated(as.list(m_exp))]
+
+m_cf_all <- m_cf_all %>% mutate(race = data.malestim$race, age = data.malestim$age, IPAddress = data.malestim$IPAddress, gender = data.malestim$gender, SDO_total = data.malestim$SDO_total) %>% subset(select = -c(`data.malestim$race`, `data.malestim$age`, `data.malestim$IPAddress`, `data.malestim$gender`, `data.malestim$SDO_total`))
+
+
+attach(m_cf_all)
+m_cf_all$total <- 
+  White_hits +
+  White_fas +
+  White_crs +
+  White_misses +
+  Black_hits +
+  Black_fas +
+  Black_crs +
+  Black_misses +
+  Latinx_hits +
+  Latinx_fas +
+  Latinx_crs +
+  Latinx_misses
+# should sum to 216; filtering out people who don't add up to that below
+detach(m_cf_all)
+
+m_dat <- m_cf_all %>% filter(total == "216")
+
+m_dat$stimGender <- "male"
+```
+
+```{r final sample descriptives and Ns}
+all_dat <- rbind(f_dat, m_dat)
+
+# only Black Ss
+black <- all_dat %>% filter(race == "1")
+
+black %>% write_csv("data_cleaned/GIRA2_clean.csv")
+
+# gender: 1 = male, 2 = female, 3 = nonbinary
+count(black, vars = "gender")
+black$age <- as.numeric(as.character(black$age))
+describe(black$age)
+
+count(black, vars = "stimGender")
+```
