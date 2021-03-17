@@ -1,0 +1,130 @@
+---
+title: "Data Analysis"
+author: "Deja Simon"
+date: "3/10/2021"
+output: html_document
+---
+```{r analysis functions}
+tTest <- function(group1, group2){
+  t.test(group1,
+       group2,
+       paired=TRUE,
+       conf.level=0.95)
+}
+
+cohenD <- function(group1, group2){
+  cohen.d(group1,
+       group2,
+       paired=TRUE,
+       conf.level=0.95)
+}
+```
+
+```{r signal detection analyses - all data}
+cf <- black
+
+cf$correct_white <- cf$White_hits + cf$White_crs
+cf$correct_black <- cf$Black_hits + cf$Black_crs
+cf$correct_latinx <- cf$Latinx_hits + cf$Latinx_crs
+
+# number correct analysis (total sample)
+describe(cf[,c("correct_white","correct_black", "correct_latinx")])
+
+attach(cf)
+# White vs. Black
+tTest(correct_white, correct_black)
+cohenD(correct_white, correct_black)
+
+# White vs. Latinx
+tTest(correct_white, correct_latinx)
+cohenD(correct_white, correct_latinx)
+
+# Black vs. Latinx
+tTest(correct_black, correct_latinx)
+cohenD(correct_black, correct_latinx)
+detach(cf)
+
+describe(cf[,c("White_hits", "White_crs", "White_fas", "White_misses",
+               "Black_hits", "Black_crs", "Black_fas", "Black_misses", "Latinx_hits", "Latinx_crs", "Latinx_fas", "Latinx_misses")])
+
+
+#36 is the max possible number of responses in each category.
+#36 hits would mean all right. 36 false alarms would be all wrong.
+#So the total (36x8=288) is double the total number of trials
+
+cf$white_hits <- cf$White_hits/36
+cf$white_cr <- cf$White_crs/36
+cf$white_fa <- cf$White_fas/36
+cf$white_miss <- cf$White_misses/36
+cf$black_hits <- cf$Black_hits/36
+cf$black_cr <- cf$Black_crs/36
+cf$black_fa <- cf$Black_fas/36
+cf$black_miss <- cf$Black_misses/36
+cf$latinx_hits <- cf$Latinx_hits/36
+cf$latinx_cr <- cf$Latinx_crs/36
+cf$latinx_fa <- cf$Latinx_fas/36
+cf$latinx_miss <- cf$Latinx_misses/36
+
+describe(cf[,c("white_hits","black_hits", "latinx_hits", "white_cr","black_cr", "latinx_cr", "white_fa","black_fa", "latinx_fa", "white_miss","black_miss", "latinx_miss")])
+
+
+#replacing 1s and 0s for signal detection analysis
+#specifically, 0 becomes one-half of an error (.5/72 = .006944) on the bottom end
+#and 1 becomes one-half of an error (71.5/72 = .993056) on the top end
+
+cf$white_hits <- ifelse(cf$white_hits==1, .993056, ifelse(cf$white_hits==0, .006944, cf$white_hits))
+cf$white_fa <- ifelse(cf$white_fa==1, .993056, ifelse(cf$white_fa==0, .006944, cf$white_fa))
+cf$black_hits <- ifelse(cf$black_hits==1, .993056, ifelse(cf$black_hits==0, .006944, cf$black_hits))
+cf$black_fa <- ifelse(cf$black_fa==1, .993056, ifelse(cf$black_fa==0, .006944, cf$black_fa))
+cf$latinx_hits <- ifelse(cf$latinx_hits==1, .993056, ifelse(cf$latinx_hits==0, .006944, cf$latinx_hits))
+cf$latinx_fa <- ifelse(cf$latinx_fa==1, .993056, ifelse(cf$latinx_fa==0, .006944, cf$latinx_fa))
+
+# d' = sensitivity. differentiating between old and new white/black faces.
+
+# c = criterion. predisposition to respond old versus new. Higher values = more signal required to say "yes, seen before"
+
+cf$whiteD <- probit(cf$white_hits) - probit(cf$white_fa)
+cf$blackD<- probit(cf$black_hits) - probit(cf$black_fa)
+cf$latinxD<- probit(cf$latinx_hits) - probit(cf$latinx_fa)
+cf$whiteC<- -(probit(cf$white_hits) + probit(cf$white_fa))/2
+cf$blackC<- -(probit(cf$black_hits) + probit(cf$black_fa))/2
+cf$latinxC<- -(probit(cf$latinx_hits) + probit(cf$latinx_fa))/2
+
+describe(cf[,c("whiteD", "blackD", "latinxD", "whiteC", "blackC", "latinxC")])
+
+# d' analysis
+
+attach(cf)
+# White vs. Black
+tTest(whiteD, blackD)
+cohenD(whiteD, blackD)
+cor.test(whiteD, blackD)
+
+# White vs. Latinx
+tTest(whiteD, latinxD)
+cohenD(whiteD, latinxD)
+cor.test(whiteD, latinxD)
+
+# Black vs. Latinx
+tTest(blackD, latinxD)
+cohenD(blackD, latinxD)
+cor.test(blackD, latinxD)
+
+
+# c analysis
+
+# White vs. Black
+tTest(whiteC, blackC)
+cohenD(whiteC, blackC)
+cor.test(whiteC, blackC)
+
+# White vs. Latinx
+tTest(whiteC, latinxC)
+cohenD(whiteC, latinxC)
+cor.test(whiteC, latinxC)
+
+# Black vs. Latinx
+tTest(blackC, latinxC)
+cohenD(blackC, latinxC)
+cor.test(blackC, latinxC)
+```
