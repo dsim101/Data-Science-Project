@@ -1,0 +1,33 @@
+---
+title: "Final Workflow Report"
+author: "Deja Simon"
+output: html_document
+---
+
+## Organization
+
+The initial changes I made pertained to my workflow's organization. 
+
+### Change #1: Project Creation
+
+I first created a project to house my data files and analysis script. I set this up to improve the sharability and reproducibility of my workflow, so that the raw data would not just live on my computer. Now, someone interested in looking over and/or reproducing my analysis will have access to the data as well.  
+
+I would previously load in the data from my working directory:  
+```{r eval=FALSE}
+setwd("~/Desktop/RSSC/GIRA/Raw Data")
+
+data <- read.csv("GIRA2_raw.csv")
+```
+
+Now, I use the `here` function to load the data from the "data_raw" folder within the project:  
+```{r eval=FALSE}
+data <- read_csv(here("data_raw", "GIRA2_raw.csv"))
+```
+
+### Change #2: File Separation
+
+The original version consisted of one large RMarkdown file, which was long and tedious to navigate (I like to use Markdown rather than regular script files beause I can separate each step into labeled chunks). While not mentioned in my critique assignment, I decided to make this change because I was tired of dealing with one long file; also, hearing my classmates' and instructors' takes on the utility of making separate scripts solidified that this would be a useful adjustment.  
+  
+I accomplished this by manually breaking up the file into multiple Markdown scripts (e.g., “Data Import and Cleaning”, “Data Transformation”, “Data Analysis”). The files can be seen in my GitHub repository.  
+
+
