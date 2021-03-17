@@ -4,7 +4,7 @@ author: "Deja Simon"
 output: html_document
 ---
 
-## Organization
+## *Organization*
 
 The initial changes I made pertained to my workflow's organization. 
 
@@ -30,4 +30,144 @@ The original version consisted of one large RMarkdown file, which was long and t
   
 I accomplished this by manually breaking up the file into multiple Markdown scripts (e.g., “Data Import and Cleaning”, “Data Transformation”, “Data Analysis”). The files can be seen in my GitHub repository.  
 
+## *Repetition Reduction*
 
+The remainder of my changes involved decreasing repetitive code. Repetition (i.e., a lot of copy and paste) occurred in multiple sections of the workflow, so I felt it was important to devote the bulk of my changes to these areas. Executing these adjustments was challenging for me, but in the end I was able to successfully reduce repetition in several spots.
+
+### Change #3: Functions
+
+The primary way I reduced repetition was by creating functions. 
+
+The first two functions I created were for the Social Dominance Orientation scale items. I initially had the same lines of code for each item: 
+```{r eval=FALSE}
+# recoding reverse items
+data$SDO1 <- revalue(data$SDO1, c("7"="1", "6"="2", "5"="3", "4"="4", "3"="5", "2"="6", "1"="7"))
+data$SDO2 <- revalue(data$SDO2, c("7"="1", "6"="2", "5"="3", "4"="4", "3"="5", "2"="6", "1"="7"))
+data$SDO3 <- revalue(data$SDO3, c("7"="1", "6"="2", "5"="3", "4"="4", "3"="5", "2"="6", "1"="7"))
+data$SDO4 <- revalue(data$SDO4, c("7"="1", "6"="2", "5"="3", "4"="4", "3"="5", "2"="6", "1"="7"))
+data$SDO5 <- revalue(data$SDO5, c("7"="1", "6"="2", "5"="3", "4"="4", "3"="5", "2"="6", "1"="7"))
+data$SDO6 <- revalue(data$SDO6, c("7"="1", "6"="2", "5"="3", "4"="4", "3"="5", "2"="6", "1"="7"))
+data$SDO7 <- revalue(data$SDO7, c("7"="1", "6"="2", "5"="3", "4"="4", "3"="5", "2"="6", "1"="7"))
+data$SDO8 <- revalue(data$SDO8, c("7"="1", "6"="2", "5"="3", "4"="4", "3"="5", "2"="6", "1"="7"))
+
+
+# making all the items numeric
+data$SDO1 <- as.numeric(as.character(data$SDO1))
+data$SDO2 <- as.numeric(as.character(data$SDO2)) 
+data$SDO3 <- as.numeric(as.character(data$SDO3)) 
+data$SDO4 <- as.numeric(as.character(data$SDO4)) 
+data$SDO5 <- as.numeric(as.character(data$SDO5))
+data$SDO6 <- as.numeric(as.character(data$SDO6))
+data$SDO7 <- as.numeric(as.character(data$SDO7))
+data$SDO8 <- as.numeric(as.character(data$SDO8))
+data$SDO9 <- as.numeric(as.character(data$SDO9))
+data$SDO10 <- as.numeric(as.character(data$SDO10))
+data$SDO11 <- as.numeric(as.character(data$SDO11))
+data$SDO12 <- as.numeric(as.character(data$SDO12))
+data$SDO13 <- as.numeric(as.character(data$SDO13))
+data$SDO14 <- as.numeric(as.character(data$SDO14))
+data$SDO15 <- as.numeric(as.character(data$SDO15))
+data$SDO16 <- as.numeric(as.character(data$SDO16))
+```
+
+Using custom functions and automation (the `across` function, specifically), I was able to eliminate this repetitive copy and pasting:
+
+```{r eval=FALSE}
+reverseCode <- function(var) {
+ var <- recode(var, `7`= 1, `6` = 2, `5` = 3, `4` = 4, `3` = 5, `2` = 6, `1` = 7)
+}
+data <- data %>% mutate(across(SDO1:SDO8, reverseCode))
+
+
+asNumeric <- function(var) {
+ var <- as.numeric(as.character(var))
+}
+data <- data %>% mutate(across(SDO1:SDO16, asNumeric))
+```
+
+One area where there was significant copy and pasting was within data transformation. The purpose of this code was to count the number of hits, correct rejections, false alarms, and misses for stimuli of three different ethnicities: 
+```{r eval=FALSE}
+# White stimuli
+num_of_hits_white <- fem.cfBasic %>% group_by(ResponseId) %>% mutate(hits_white = case_when(Correct == '1' & Type == "White" ~ 1, TRUE ~ 0)) %>% tally(hits_white)
+
+num_of_cr_white <- fem.cfBasic %>% group_by(ResponseId) %>% mutate(cr_white = case_when(Correct == '2' & Type == "White" ~ 1, TRUE ~ 0)) %>% tally(cr_white)
+
+num_of_fa_white <- fem.cfBasic %>% group_by(ResponseId) %>% mutate(fa_white = case_when(Incorrect == '1' & Type == "White" ~ 1, TRUE ~ 0)) %>% tally(fa_white)
+
+num_of_miss_white <- fem.cfBasic %>% group_by(ResponseId) %>% mutate(miss_white = case_when(Incorrect == '2' & Type == "White" ~ 1, TRUE ~ 0)) %>% tally(miss_white)
+
+
+# Black stimuli
+num_of_hits_black <- fem.cfBasic %>% group_by(ResponseId) %>% mutate(hits_black = case_when(Correct == '1' & Type == "Black" ~ 1, TRUE ~ 0)) %>% tally(hits_black)
+
+num_of_cr_black <- fem.cfBasic %>% group_by(ResponseId) %>% mutate(cr_black = case_when(Correct == '2' & Type == "Black" ~ 1, TRUE ~ 0)) %>% tally(cr_black)
+
+num_of_fa_black <- fem.cfBasic %>% group_by(ResponseId) %>% mutate(fa_black = case_when(Incorrect == '1' & Type == "Black" ~ 1, TRUE ~ 0)) %>% tally(fa_black)
+
+num_of_miss_black <- fem.cfBasic %>% group_by(ResponseId) %>% mutate(miss_black = case_when(Incorrect == '2' & Type == "Black" ~ 1, TRUE ~ 0)) %>% tally(miss_black)
+
+
+# Latinx stimuli
+num_of_hits_latinx <- fem.cfBasic %>% group_by(ResponseId) %>% mutate(hits_latinx = case_when(Correct == '1' & Type == "Latinx" ~ 1, TRUE ~ 0)) %>% tally(hits_latinx)
+
+num_of_cr_latinx <- fem.cfBasic %>% group_by(ResponseId) %>% mutate(cr_latinx = case_when(Correct == '2' & Type == "Latinx" ~ 1, TRUE ~ 0)) %>% tally(cr_latinx)
+
+num_of_fa_latinx <- fem.cfBasic %>% group_by(ResponseId) %>% mutate(fa_latinx = case_when(Incorrect == '1' & Type == "Latinx" ~ 1, TRUE ~ 0)) %>% tally(fa_latinx)
+
+num_of_miss_latinx <- fem.cfBasic %>% group_by(ResponseId) %>% mutate(miss_latinx = case_when(Incorrect == '2' & Type == "Latinx" ~ 1, TRUE ~ 0)) %>% tally(miss_latinx)
+```
+
+To improve this code, John and Jake helped me create a function that could be applied to each ethnicity:
+```{r eval=FALSE}
+sigDet <- function(data, type) {
+num_of_hits <- data %>% group_by(ResponseId) %>% mutate(hits = case_when(Correct == '1' & Type == type ~ 1, TRUE ~ 0)) %>% tally(hits) 
+
+num_of_cr <- data %>% group_by(ResponseId) %>% mutate(cr = case_when(Correct == '2' & Type == type ~ 1, TRUE ~ 0)) %>% tally(cr)
+
+num_of_fa <- data %>% group_by(ResponseId) %>% mutate(fa = case_when(Incorrect == '1' & Type == type ~ 1, TRUE ~ 0)) %>% tally(fa) 
+
+num_of_miss <- data %>% group_by(ResponseId) %>% mutate(miss = case_when(Incorrect == '2' & Type == type ~ 1, TRUE ~ 0)) %>% tally(miss) 
+
+cbind(num_of_hits, num_of_cr$n, num_of_fa$n, num_of_miss$n) %>% set_names("ResponseId", paste0(type,"_hits"), paste0(type,"_crs"), paste0(type,"_fas"), paste0(type,"_misses"))
+}
+```
+
+Finally, I computed various t-tests and effect sizes within my data analysis. These are a couple of examples:
+```{r eval=FALSE}
+# White vs. Black d'
+t.test(cf$whiteD,
+       cf$blackD,
+       paired=TRUE,
+       conf.level=0.95)
+
+cohen.d(cf$whiteD,
+        cf$blackD,
+        paired=TRUE,
+        conf.level=0.95)
+
+# White vs. Black c
+t.test(cf$whiteC,
+       cf$blackC,
+       paired=TRUE,
+       conf.level=0.95)
+
+cohen.d(cf$whiteC,
+        cf$blackC,
+        paired=TRUE,
+        conf.level=0.95)
+```
+
+By creating t-test and Cohen's D functions, I was able to run these analyses without copy and pasting the code each time: 
+```{r eval=FALSE}
+# White vs. Black d'
+tTest(whiteD, blackD)
+cohenD(whiteD, blackD)
+
+# White vs. Black c
+tTest(whiteC, blackC)
+cohenD(whiteC, blackC)
+```
+
+--  
+
+In conclusion, while my new workflow isn't perfect, I was able to increase its efficiency, fidelity, and sharing/reproducibility in multiple ways. 
