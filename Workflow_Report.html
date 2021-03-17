@@ -128,7 +128,7 @@ $(document).ready(function () {
 
 
 <div id="organization" class="section level2">
-<h2>Organization</h2>
+<h2><em>Organization</em></h2>
 <p>The initial changes I made pertained to my workflow’s organization.</p>
 <div id="change-1-project-creation" class="section level3">
 <h3>Change #1: Project Creation</h3>
@@ -143,7 +143,128 @@ data &lt;- read.csv(&quot;GIRA2_raw.csv&quot;)</code></pre>
 <div id="change-2-file-separation" class="section level3">
 <h3>Change #2: File Separation</h3>
 <p>The original version consisted of one large RMarkdown file, which was long and tedious to navigate (I like to use Markdown rather than regular script files beause I can separate each step into labeled chunks). While not mentioned in my critique assignment, I decided to make this change because I was tired of dealing with one long file; also, hearing my classmates’ and instructors’ takes on the utility of making separate scripts solidified that this would be a useful adjustment.</p>
-<p>I accomplished this by manually breaking up the file into multiple Markdown scripts (e.g., “Data Import and Cleaning”, “Data Transformation”, “Data Analysis”). The new files can be seen in the GitHub repository.</p>
+<p>I accomplished this by manually breaking up the file into multiple Markdown scripts (e.g., “Data Import and Cleaning”, “Data Transformation”, “Data Analysis”). The files can be seen in my GitHub repository.</p>
+</div>
+</div>
+<div id="repetition-reduction" class="section level2">
+<h2><em>Repetition Reduction</em></h2>
+<p>The remainder of my changes involved decreasing repetitive code. Repetition (i.e., a lot of copy and paste) occurred in multiple sections of the workflow, so I felt it was important to devote the bulk of my changes to these areas. Executing these adjustments was challenging for me, but in the end I was able to successfully reduce repetition in several spots.</p>
+<div id="change-3-functions" class="section level3">
+<h3>Change #3: Functions</h3>
+<p>The primary way I reduced repetition was by creating functions.</p>
+<p>The first two functions I created were for the Social Dominance Orientation scale items. I initially had the same lines of code for each item:</p>
+<pre class="r"><code># recoding reverse items
+data$SDO1 &lt;- revalue(data$SDO1, c(&quot;7&quot;=&quot;1&quot;, &quot;6&quot;=&quot;2&quot;, &quot;5&quot;=&quot;3&quot;, &quot;4&quot;=&quot;4&quot;, &quot;3&quot;=&quot;5&quot;, &quot;2&quot;=&quot;6&quot;, &quot;1&quot;=&quot;7&quot;))
+data$SDO2 &lt;- revalue(data$SDO2, c(&quot;7&quot;=&quot;1&quot;, &quot;6&quot;=&quot;2&quot;, &quot;5&quot;=&quot;3&quot;, &quot;4&quot;=&quot;4&quot;, &quot;3&quot;=&quot;5&quot;, &quot;2&quot;=&quot;6&quot;, &quot;1&quot;=&quot;7&quot;))
+data$SDO3 &lt;- revalue(data$SDO3, c(&quot;7&quot;=&quot;1&quot;, &quot;6&quot;=&quot;2&quot;, &quot;5&quot;=&quot;3&quot;, &quot;4&quot;=&quot;4&quot;, &quot;3&quot;=&quot;5&quot;, &quot;2&quot;=&quot;6&quot;, &quot;1&quot;=&quot;7&quot;))
+data$SDO4 &lt;- revalue(data$SDO4, c(&quot;7&quot;=&quot;1&quot;, &quot;6&quot;=&quot;2&quot;, &quot;5&quot;=&quot;3&quot;, &quot;4&quot;=&quot;4&quot;, &quot;3&quot;=&quot;5&quot;, &quot;2&quot;=&quot;6&quot;, &quot;1&quot;=&quot;7&quot;))
+data$SDO5 &lt;- revalue(data$SDO5, c(&quot;7&quot;=&quot;1&quot;, &quot;6&quot;=&quot;2&quot;, &quot;5&quot;=&quot;3&quot;, &quot;4&quot;=&quot;4&quot;, &quot;3&quot;=&quot;5&quot;, &quot;2&quot;=&quot;6&quot;, &quot;1&quot;=&quot;7&quot;))
+data$SDO6 &lt;- revalue(data$SDO6, c(&quot;7&quot;=&quot;1&quot;, &quot;6&quot;=&quot;2&quot;, &quot;5&quot;=&quot;3&quot;, &quot;4&quot;=&quot;4&quot;, &quot;3&quot;=&quot;5&quot;, &quot;2&quot;=&quot;6&quot;, &quot;1&quot;=&quot;7&quot;))
+data$SDO7 &lt;- revalue(data$SDO7, c(&quot;7&quot;=&quot;1&quot;, &quot;6&quot;=&quot;2&quot;, &quot;5&quot;=&quot;3&quot;, &quot;4&quot;=&quot;4&quot;, &quot;3&quot;=&quot;5&quot;, &quot;2&quot;=&quot;6&quot;, &quot;1&quot;=&quot;7&quot;))
+data$SDO8 &lt;- revalue(data$SDO8, c(&quot;7&quot;=&quot;1&quot;, &quot;6&quot;=&quot;2&quot;, &quot;5&quot;=&quot;3&quot;, &quot;4&quot;=&quot;4&quot;, &quot;3&quot;=&quot;5&quot;, &quot;2&quot;=&quot;6&quot;, &quot;1&quot;=&quot;7&quot;))
+
+
+# making all the items numeric
+data$SDO1 &lt;- as.numeric(as.character(data$SDO1))
+data$SDO2 &lt;- as.numeric(as.character(data$SDO2)) 
+data$SDO3 &lt;- as.numeric(as.character(data$SDO3)) 
+data$SDO4 &lt;- as.numeric(as.character(data$SDO4)) 
+data$SDO5 &lt;- as.numeric(as.character(data$SDO5))
+data$SDO6 &lt;- as.numeric(as.character(data$SDO6))
+data$SDO7 &lt;- as.numeric(as.character(data$SDO7))
+data$SDO8 &lt;- as.numeric(as.character(data$SDO8))
+data$SDO9 &lt;- as.numeric(as.character(data$SDO9))
+data$SDO10 &lt;- as.numeric(as.character(data$SDO10))
+data$SDO11 &lt;- as.numeric(as.character(data$SDO11))
+data$SDO12 &lt;- as.numeric(as.character(data$SDO12))
+data$SDO13 &lt;- as.numeric(as.character(data$SDO13))
+data$SDO14 &lt;- as.numeric(as.character(data$SDO14))
+data$SDO15 &lt;- as.numeric(as.character(data$SDO15))
+data$SDO16 &lt;- as.numeric(as.character(data$SDO16))</code></pre>
+<p>Using custom functions and automation (the <code>across</code> function, specifically), I was able to eliminate this repetitive copy and pasting:</p>
+<pre class="r"><code>reverseCode &lt;- function(var) {
+ var &lt;- recode(var, `7`= 1, `6` = 2, `5` = 3, `4` = 4, `3` = 5, `2` = 6, `1` = 7)
+}
+data &lt;- data %&gt;% mutate(across(SDO1:SDO8, reverseCode))
+
+
+asNumeric &lt;- function(var) {
+ var &lt;- as.numeric(as.character(var))
+}
+data &lt;- data %&gt;% mutate(across(SDO1:SDO16, asNumeric))</code></pre>
+<p>One area where there was significant copy and pasting was within data transformation. The purpose of this code was to count the number of hits, correct rejections, false alarms, and misses for stimuli of three different ethnicities:</p>
+<pre class="r"><code># White stimuli
+num_of_hits_white &lt;- fem.cfBasic %&gt;% group_by(ResponseId) %&gt;% mutate(hits_white = case_when(Correct == '1' &amp; Type == &quot;White&quot; ~ 1, TRUE ~ 0)) %&gt;% tally(hits_white)
+
+num_of_cr_white &lt;- fem.cfBasic %&gt;% group_by(ResponseId) %&gt;% mutate(cr_white = case_when(Correct == '2' &amp; Type == &quot;White&quot; ~ 1, TRUE ~ 0)) %&gt;% tally(cr_white)
+
+num_of_fa_white &lt;- fem.cfBasic %&gt;% group_by(ResponseId) %&gt;% mutate(fa_white = case_when(Incorrect == '1' &amp; Type == &quot;White&quot; ~ 1, TRUE ~ 0)) %&gt;% tally(fa_white)
+
+num_of_miss_white &lt;- fem.cfBasic %&gt;% group_by(ResponseId) %&gt;% mutate(miss_white = case_when(Incorrect == '2' &amp; Type == &quot;White&quot; ~ 1, TRUE ~ 0)) %&gt;% tally(miss_white)
+
+
+# Black stimuli
+num_of_hits_black &lt;- fem.cfBasic %&gt;% group_by(ResponseId) %&gt;% mutate(hits_black = case_when(Correct == '1' &amp; Type == &quot;Black&quot; ~ 1, TRUE ~ 0)) %&gt;% tally(hits_black)
+
+num_of_cr_black &lt;- fem.cfBasic %&gt;% group_by(ResponseId) %&gt;% mutate(cr_black = case_when(Correct == '2' &amp; Type == &quot;Black&quot; ~ 1, TRUE ~ 0)) %&gt;% tally(cr_black)
+
+num_of_fa_black &lt;- fem.cfBasic %&gt;% group_by(ResponseId) %&gt;% mutate(fa_black = case_when(Incorrect == '1' &amp; Type == &quot;Black&quot; ~ 1, TRUE ~ 0)) %&gt;% tally(fa_black)
+
+num_of_miss_black &lt;- fem.cfBasic %&gt;% group_by(ResponseId) %&gt;% mutate(miss_black = case_when(Incorrect == '2' &amp; Type == &quot;Black&quot; ~ 1, TRUE ~ 0)) %&gt;% tally(miss_black)
+
+
+# Latinx stimuli
+num_of_hits_latinx &lt;- fem.cfBasic %&gt;% group_by(ResponseId) %&gt;% mutate(hits_latinx = case_when(Correct == '1' &amp; Type == &quot;Latinx&quot; ~ 1, TRUE ~ 0)) %&gt;% tally(hits_latinx)
+
+num_of_cr_latinx &lt;- fem.cfBasic %&gt;% group_by(ResponseId) %&gt;% mutate(cr_latinx = case_when(Correct == '2' &amp; Type == &quot;Latinx&quot; ~ 1, TRUE ~ 0)) %&gt;% tally(cr_latinx)
+
+num_of_fa_latinx &lt;- fem.cfBasic %&gt;% group_by(ResponseId) %&gt;% mutate(fa_latinx = case_when(Incorrect == '1' &amp; Type == &quot;Latinx&quot; ~ 1, TRUE ~ 0)) %&gt;% tally(fa_latinx)
+
+num_of_miss_latinx &lt;- fem.cfBasic %&gt;% group_by(ResponseId) %&gt;% mutate(miss_latinx = case_when(Incorrect == '2' &amp; Type == &quot;Latinx&quot; ~ 1, TRUE ~ 0)) %&gt;% tally(miss_latinx)</code></pre>
+<p>To improve this code, John and Jake helped me create a function that could be applied to each ethnicity:</p>
+<pre class="r"><code>sigDet &lt;- function(data, type) {
+num_of_hits &lt;- data %&gt;% group_by(ResponseId) %&gt;% mutate(hits = case_when(Correct == '1' &amp; Type == type ~ 1, TRUE ~ 0)) %&gt;% tally(hits) 
+
+num_of_cr &lt;- data %&gt;% group_by(ResponseId) %&gt;% mutate(cr = case_when(Correct == '2' &amp; Type == type ~ 1, TRUE ~ 0)) %&gt;% tally(cr)
+
+num_of_fa &lt;- data %&gt;% group_by(ResponseId) %&gt;% mutate(fa = case_when(Incorrect == '1' &amp; Type == type ~ 1, TRUE ~ 0)) %&gt;% tally(fa) 
+
+num_of_miss &lt;- data %&gt;% group_by(ResponseId) %&gt;% mutate(miss = case_when(Incorrect == '2' &amp; Type == type ~ 1, TRUE ~ 0)) %&gt;% tally(miss) 
+
+cbind(num_of_hits, num_of_cr$n, num_of_fa$n, num_of_miss$n) %&gt;% set_names(&quot;ResponseId&quot;, paste0(type,&quot;_hits&quot;), paste0(type,&quot;_crs&quot;), paste0(type,&quot;_fas&quot;), paste0(type,&quot;_misses&quot;))
+}</code></pre>
+<p>Finally, I computed various t-tests and effect sizes within my data analysis. These are a couple of examples:</p>
+<pre class="r"><code># White vs. Black d'
+t.test(cf$whiteD,
+       cf$blackD,
+       paired=TRUE,
+       conf.level=0.95)
+
+cohen.d(cf$whiteD,
+        cf$blackD,
+        paired=TRUE,
+        conf.level=0.95)
+
+# White vs. Black c
+t.test(cf$whiteC,
+       cf$blackC,
+       paired=TRUE,
+       conf.level=0.95)
+
+cohen.d(cf$whiteC,
+        cf$blackC,
+        paired=TRUE,
+        conf.level=0.95)</code></pre>
+<p>By creating t-test and Cohen’s D functions, I was able to run these analyses without copy and pasting the code each time:</p>
+<pre class="r"><code># White vs. Black d'
+tTest(whiteD, blackD)
+cohenD(whiteD, blackD)
+
+# White vs. Black c
+tTest(whiteC, blackC)
+cohenD(whiteC, blackC)</code></pre>
+<p>–</p>
+<p>In conclusion, while my new workflow isn’t perfect, I was able to increase its efficiency, fidelity, and sharing/reproducibility in multiple ways.</p>
 </div>
 </div>
 
